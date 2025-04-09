@@ -2,7 +2,10 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First update the device Id and Telementary key in Components/EnergyChart.js file.
+Then Update Username and password with "demo.thingsboard.io" account in pages/api/thingsboard.js file.
+
+Now run the development server:
 
 ```bash
 npm run dev
