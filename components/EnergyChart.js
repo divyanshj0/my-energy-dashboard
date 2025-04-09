@@ -11,25 +11,27 @@ import {
 import { Dialog } from '@headlessui/react';
 import { ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
-import { fetchTelemetry } from '@/libs/thingsboard';
 
 export default function EnergyChart() {
   const [energyData, setEnergyData] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const DEVICE_ID = '106af2d0-1565-11f0-b2a1-d54aa288b541'; // Air Quality Sensor C1
-  const TELEMETRY_KEY = 'co2';
+  const DEVICE_ID = 'Device id here'; 
+  const TELEMETRY_KEY = 'Telementary Key Here';
 
   useEffect(() => {
     async function loadData() {
       try {
-        const data = await fetchTelemetry(DEVICE_ID, [TELEMETRY_KEY]);
-        const parsed = data[TELEMETRY_KEY].map((entry) => ({
+        const res = await fetch(`/api/thingsboard?deviceId=${DEVICE_ID}&keys=${TELEMETRY_KEY}`);
+        const data = await res.json();
+
+        const parsed = data[TELEMETRY_KEY]?.map((entry) => ({
           hour: new Date(Number(entry.ts)).toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit',
           }),
           value: Number(entry.value),
-        }));
+        })) || [];
+
         setEnergyData(parsed);
       } catch (err) {
         console.error('Failed to load telemetry:', err);
@@ -43,7 +45,7 @@ export default function EnergyChart() {
   const min = Math.min(...values).toFixed(1);
   const max = Math.max(...values).toFixed(1);
   const total = values.reduce((sum, v) => sum + v, 0).toFixed(1);
-  const avg = (total / values.length).toFixed(1);
+  const avg = (values.length ? (total / values.length).toFixed(1) : 0);
 
   return (
     <>
@@ -77,7 +79,7 @@ export default function EnergyChart() {
         </div>
       </div>
 
-      {/* Fullscreen */}
+      {/* Fullscreen Dialog */}
       <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/60" />
         <div className="fixed inset-0 flex items-center justify-center p-6">
